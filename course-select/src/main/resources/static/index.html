@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Demo</title>
+    <script src="https://cdn.jsdelivr.net/sockjs/1.1.2/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h2>WebSocket Chat</h2>
+    <div>
+        <input type="text" id="message" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <div id="chatbox"></div>
+
+    <script>
+        var stompClient = null;
+
+        function connect() {
+            var socket = new SockJS('/ws?userId=IM113001');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+
+                stompClient.subscribe('/topic/messages', function (callback) {
+                    showMessage(callback.body);
+                    const {state, message, data} = JSON.parse(callback.body);
+                    console.log({state, message, data});
+                });
+            });
+        }
+
+        function sendMessage() {
+            var message = document.getElementById("message").value;
+            var param = {
+                courseRequired: '2',
+                depId: 'IM',
+                courseYear: new Date().getFullYear() - 1911,
+                courseSemester: new Date().getMonth() >= 5 ? 1 : 2
+            }
+            stompClient.send("/app/sendMessage", {}, JSON.stringify(param));
+        }
+
+        function showMessage(message) {
+            var chatbox = document.getElementById("chatbox");
+            var messageElement = document.createElement("p");
+            messageElement.appendChild(document.createTextNode(message));
+            chatbox.appendChild(messageElement);
+        }
+
+        connect();
+    </script>
+</body>
+</html>
