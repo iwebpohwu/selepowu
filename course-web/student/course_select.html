@@ -136,8 +136,71 @@
         findAllCourse();
 
         // 每隔0.5秒鐘調用一次 findAllCourse 函數
-        setInterval(findAllCourse, 500);
+        // setInterval(findAllCourse, 500);
 
+        var socket = new SockJS(`${selectIp}/ws?userId=${userId}`);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            stompClient.subscribe('/topic/messages', function (callback) {
+                // 保存當前選中的課程ID
+                var selectedCourseIds = [];
+                $('#selectedCourses .course-item.active').each(function () {
+                    selectedCourseIds.push($(this).data('course').courseId);
+                });
+                $('#availableCourses .course-item.active').each(function () {
+                    selectedCourseIds.push($(this).data('course').courseId);
+                });
+
+                const { state, message, data } = JSON.parse(callback.body);
+                $('#availableCourses').html('');
+                $('#selectedCourses').html('');
+                data.forEach(obj => {
+                    var jsonStr = JSON.stringify(obj);
+
+                    var column;
+                    switch (obj.courseOfWeek) {
+                        case 'Monday':
+                            column = 0;
+                            break;
+                        case 'Tuesday':
+                            column = 1;
+                            break;
+                        case 'Wednesday':
+                            column = 2;
+                            break;
+                        case 'Thursday':
+                            column = 3;
+                            break;
+                        case 'Friday':
+                            column = 4;
+                            break;
+                    }
+                var rowIndex = obj.courseStart < 5 ? obj.courseStart - 1 : obj.courseStart;
+                var findSchedule = $('#scheduleBody').find('tr').eq(rowIndex).find('td').eq(column).text();
+                if (findSchedule.includes(obj.courseName)) {
+                        $('#selectedCourses').append(`
+                        <li class="list-group-item course-item" data-course='${jsonStr}'">${obj.courseName} - ${obj.courseTime}(${obj.enrolledStudent}/${obj.courseCapacity})</li>
+                    `);
+                    } else {
+                        $('#availableCourses').append(`
+                            <li class="list-group-item course-item" data-course='${jsonStr}'">${obj.courseName} - ${obj.courseTime}(${obj.enrolledStudent}/${obj.courseCapacity})</li>
+                        `);
+                    }
+                });
+                // 恢復之前選中的課程狀態
+                $('#selectedCourses .course-item').each(function () {
+                    if (selectedCourseIds.includes($(this).data('course').courseId)) {
+                        $(this).addClass('active');
+                    }
+                });
+                $('#availableCourses .course-item').each(function () {
+                    if (selectedCourseIds.includes($(this).data('course').courseId)) {
+                        $(this).addClass('active');
+                    }
+                });
+            });
+        });
         // 點擊課程項目時選中課程
         $(document).on('click', '.course-item', function () {
             $('.course-item').removeClass('active');
