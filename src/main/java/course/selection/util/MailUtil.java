@@ -12,10 +12,10 @@ import javax.mail.internet.MimeMessage;
 public class MailUtil {
     public static boolean sendMail (String email, String OTP) {
         String to = email;
-        String from = "jason19951003@gmail.com";
+        String from = "hwugogo103@gmail.com";
 		String host = "smtp.gmail.com";
 		int port = 587;
-		final String username = "jason19951003@gmail.com";//smtp帳號
+		final String username = "hwugogo103@gmail.com";//smtp帳號
 		final String password = "";//smtp密碼
 		
 		Properties properties = new Properties();
