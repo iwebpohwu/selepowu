@@ -23,13 +23,13 @@ create table if not exists department (
     department_name varchar(255) not null
 );
 
-insert into department (department_id, department_name) values('IM', '資訊管理系');
+insert into department (department_id, department_name) values('IM', '資訊管理學科');
 insert into department (department_id, department_name) values('GE','通識');
 insert into department (department_id, department_name) values('TE','老師');
 
 create table if not exists class_info(
     class_id int AUTO_INCREMENT primary key,
-    department_id char(2) not null COMMENT '科系',
+    department_id char(2) not null COMMENT '學科',
     grade int not null COMMENT '年級',
     class_name varchar(255) not null COMMENT '班級',
     foreign key (department_id) references department(department_id)
@@ -65,7 +65,7 @@ create table if not exists user_info(
     sex ENUM('1','2') COMMENT '性別',
     email varchar(255) COMMENT '信箱',
     phone varchar(255) COMMENT '手機',
-    department_id char(2) COMMENT '科系',
+    department_id char(2) COMMENT '學科',
     class_id int COMMENT '班級',
     admission_date Date COMMENT '入學日期',
     avatar varchar(255) COMMENT '大頭貼',
@@ -78,7 +78,7 @@ insert into user_info (user_id, user_password, permission_id, user_name) values 
 
 create table if not exists course_info (
     course_index int auto_increment primary key COMMENT '索引',
-    course_dep char(2) not null COMMENT '科系',
+    course_dep char(2) not null COMMENT '學科',
     course_id char(3) not null COMMENT '課程代號',
     course_grade int not null COMMENT '課程年級',
     course_name varchar(255) not null COMMENT '課程名稱',
